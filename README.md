@@ -4,9 +4,9 @@ A tool which can read boot, recovery,header of mmcblk0,frp and so on.Also conclu
 
 ## Usage
 
-1.download zip,unzip and install debug version.
+1. Download zip,unzip and install debug version.
 
-2.after that,click the buttom,this application will backup your boot and 8m head of mmcblk0 to sdcard.
+2. After that,click the buttom,this application will backup your boot and 8m head of mmcblk0 to sdcard.
 
 for allwinner device,you can analysis your device through 32m empty header at 0x2000 offset which usually contains spl file.
 
