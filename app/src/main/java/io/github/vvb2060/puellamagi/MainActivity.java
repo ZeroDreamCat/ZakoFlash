@@ -138,31 +138,39 @@ public final class MainActivity extends Activity {
 		if (shell == null || !shell.isRoot()) return;
 
 		// 先诊断
-		console.add("诊断: 检查分区节点");
-		shell.newJob().add("ls -l /dev/block/mmcblk0p3 2>&1 || echo 'p3 not found'").to(console).submit();
-		shell.newJob().add("ls -l /dev/block/by-name/boot 2>&1").to(console).submit();
-
-		// 实际备份命令（带 2>&1）
-		String[] commands = {
-			"dd if=/dev/block/mmcblk0p3 of=/data/local/tmp/boot.img bs=4M 2>&1",
-			"dd if=/dev/block/mmcblk0 of=/data/local/tmp/mmcblk0_head_8M.bin bs=1M count=8 2>&1"
+		console.add("=== 诊断开始 ===");
+		String[] diag = {
+			"which dd",
+			"ls -l /system/bin/dd",
+			"touch /data/local/tmp/test_write && echo writable || echo not writable",
+			"df -h /data"
 		};
+		for (String cmd : diag) {
+			Shell.Result r = shell.newJob().add(cmd).exec();
+			console.add("> " + cmd + " (code=" + r.getCode() + ")");
+			for (String line : r.getOut()) console.add(line);
+		}
+		console.add("=== 诊断结束 ===");
 
-		binding.install.setText("备份分区");
+		// 使用完整路径和 sh -c 包装
+		String backupBoot = "sh -c '/system/bin/dd if=/dev/block/mmcblk0p3 of=/data/local/tmp/boot.img bs=4M 2>&1; echo DD_BOOT_EXIT=$?'";
+		String backupFull = "sh -c '/system/bin/dd if=/dev/block/mmcblk0 of=/data/local/tmp/mmcblk0_head_8M.bin bs=1M count=8 2>&1; echo DD_FULL_EXIT=$?'";
+
+		binding.install.setText("执行备份");
 		binding.install.setVisibility(View.VISIBLE);
 		binding.install.setOnClickListener(v -> {
 			binding.install.setEnabled(false);
-			console.add(">>> 开始备份 <<<");
-			for (String cmd : commands) {
-				console.add("> " + cmd);
-				Shell.Result r = shell.newJob().add(cmd).exec();
-				console.add("退出码: " + r.getCode());
-				for (String line : r.getOut()) console.add(line);
-			}
+			console.add(">>> 备份 boot 分区 <<<");
+			Shell.Result r1 = shell.newJob().add(backupBoot).exec();
+			for (String line : r1.getOut()) console.add(line);
+			console.add(">>> 备份 mmcblk0 前8M <<<");
+			Shell.Result r2 = shell.newJob().add(backupFull).exec();
+			for (String line : r2.getOut()) console.add(line);
 			console.add(">>> 备份完成 <<<");
 			binding.install.setEnabled(true);
 		});
 	}
+	
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
