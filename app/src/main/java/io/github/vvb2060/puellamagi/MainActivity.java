@@ -135,58 +135,56 @@ public final class MainActivity extends Activity {
 
 	@SuppressLint("SetTextI18n")
 	void installMagisk() {
-		String cmdFilePath = "/sdcard/my_commands.txt";
-
-		// 检查 shell 状态
 		if (shell == null) {
 			console.add("Shell 对象为 null");
 			return;
 		}
 		console.add("Shell 状态: " + (shell.isRoot() ? "Root" : "Non-root"));
 
-		// 尝试其他可能的路径（某些设备 /sdcard 可能指向不同位置）
+		// 优先推荐用户将文件放在 /data/local/tmp/ 下
 		String[] possiblePaths = {
+			"/data/local/tmp/my_commands.txt",
 			"/sdcard/my_commands.txt",
-			"/storage/emulated/0/my_commands.txt",
-			"/mnt/sdcard/my_commands.txt"
+			"/storage/emulated/0/my_commands.txt"
 		};
 
 		String actualPath = null;
+		String fileContent = null;
+
+		// 尝试用 cat 读取文件，不依赖 test
 		for (String path : possiblePaths) {
-			Shell.Result testResult = shell.newJob().add("test -f " + path + " && echo EXISTS").exec();
-			if (testResult.getOut().contains("EXISTS")) {
+			// 使用完整路径的 cat（避免别名干扰）
+			Shell.Result catResult = shell.newJob().add("/system/bin/cat " + path + " 2>/dev/null").exec();
+			if (catResult.getCode() == 0 && !catResult.getOut().isEmpty()) {
 				actualPath = path;
+				fileContent = String.join("\n", catResult.getOut());
+				break;
+			}
+			// 如果 /system/bin/cat 不存在，尝试普通 cat
+			catResult = shell.newJob().add("cat " + path + " 2>/dev/null").exec();
+			if (catResult.getCode() == 0 && !catResult.getOut().isEmpty()) {
+				actualPath = path;
+				fileContent = String.join("\n", catResult.getOut());
 				break;
 			}
 		}
 
 		if (actualPath == null) {
-			console.add("在所有常见路径下都未找到命令文件");
-			// 列出 /sdcard 目录内容帮助排查
-			Shell.Result lsResult = shell.newJob().add("ls -l /sdcard/").exec();
-			console.add("/sdcard/ 目录内容:");
-			for (String line : lsResult.getOut()) {
-				console.add(line);
-			}
-			for (String err : lsResult.getErr()) {
-				console.add("ls stderr: " + err);
-			}
+			console.add("未找到命令文件。请将命令文件放置于以下任一位置：");
+			for (String p : possiblePaths) console.add("  " + p);
+			console.add("文件格式：每行一条命令，支持 # 注释");
+			// 额外提示：也可以使用输入框手动执行
+			console.add("提示：你也可以使用界面上的输入框直接执行命令");
 			return;
 		}
 
 		console.add("找到命令文件: " + actualPath);
+		console.add("文件内容预览:\n" + (fileContent.length() > 200 ? fileContent.substring(0, 200) + "..." : fileContent));
 
-		// 直接读取文件内容
-		Shell.Result catResult = shell.newJob().add("cat " + actualPath).exec();
-		console.add("cat 退出码: " + catResult.getCode());
-		if (catResult.getCode() != 0) {
-			console.add("读取文件失败，stderr: " + catResult.getErr());
-			return;
-		}
-
-		// 解析命令
+		// 解析命令（按行分割）
+		String[] lines = fileContent.split("\n");
 		List<String> commands = new ArrayList<>();
-		for (String line : catResult.getOut()) {
+		for (String line : lines) {
 			line = line.trim();
 			if (!line.isEmpty() && !line.startsWith("#")) {
 				commands.add(line);
@@ -194,21 +192,27 @@ public final class MainActivity extends Activity {
 		}
 
 		if (commands.isEmpty()) {
-			console.add("命令文件为空，没有可执行的命令");
+			console.add("命令文件没有有效的命令（空或全是注释）");
 			return;
 		}
 
-		console.add("找到 " + commands.size() + " 条命令，点击下方按钮执行");
+		console.add("共 " + commands.size() + " 条有效命令，点击下方按钮执行");
 		binding.install.setText("执行自定义命令");
 		binding.install.setVisibility(View.VISIBLE);
 		binding.install.setOnClickListener(v -> {
 			binding.install.setEnabled(false);
-			console.add(">>> 开始执行自定义命令 <<<");
+			console.add(">>> 开始执行命令 <<<");
+			// 使用 shell 执行命令列表
 			shell.newJob().add(commands.toArray(new String[0])).to(console).submit(result -> {
 				if (result.isSuccess()) {
 					console.add(">>> 所有命令执行成功 <<<");
 				} else {
-					console.add(">>> 部分命令执行失败，退出码：" + result.getCode() + " <<<");
+					console.add(">>> 部分命令执行失败，退出码：" + result.getCode());
+					// 如果有错误输出，也打印出来
+					if (!result.getErr().isEmpty()) {
+						console.add("错误输出:");
+						for (String err : result.getErr()) console.add("  " + err);
+					}
 				}
 				binding.install.setEnabled(true);
 			});
