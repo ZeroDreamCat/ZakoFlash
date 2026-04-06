@@ -16,7 +16,7 @@
 
 package com.topjohnwu.superuser.internal;
 
-import static io.github.vvb2060.puellamagi.App.TAG;
+import static io.zerodreamcat.zako.flash.App.TAG;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

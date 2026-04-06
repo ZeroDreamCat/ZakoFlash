@@ -1,6 +1,6 @@
-package io.github.vvb2060.puellamagi;
+package io.zerodreamcat.zako.flash;
 
-import io.github.vvb2060.puellamagi.IRemoteProcess;
+import io.zerodreamcat.zako.flash.IRemoteProcess;
 
 interface IRemoteService {
     IRemoteProcess getRemoteProcess();

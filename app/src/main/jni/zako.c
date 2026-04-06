@@ -89,7 +89,7 @@ jint JNI_OnLoad(JavaVM *jvm, void *v __unused) {
         return JNI_ERR;
     }
 
-    if ((clazz = (*env)->FindClass(env, "io/github/vvb2060/puellamagi/MagicaService")) == NULL) {
+    if ((clazz = (*env)->FindClass(env, "io/zerodreamcat/zako/flash/ZakoService")) == NULL) {
         return JNI_ERR;
     }
 

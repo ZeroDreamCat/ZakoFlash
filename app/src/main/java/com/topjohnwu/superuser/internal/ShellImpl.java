@@ -39,9 +39,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import io.github.vvb2060.puellamagi.App;
-import io.github.vvb2060.puellamagi.IRemoteProcess;
-import io.github.vvb2060.puellamagi.RemoteProcess;
+import io.zerodreamcat.zako.flash.App;
+import io.zerodreamcat.zako.flash.IRemoteProcess;
+import io.zerodreamcat.zako.flash.RemoteProcess;
 
 import static com.topjohnwu.superuser.internal.Utils.UTF_8;
 

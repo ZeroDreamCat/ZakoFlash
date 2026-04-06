@@ -1,4 +1,4 @@
-package io.github.vvb2060.puellamagi;
+package io.zerodreamcat.zako.flash;
 
 interface IRemoteProcess {
     ParcelFileDescriptor  getOutputStream();

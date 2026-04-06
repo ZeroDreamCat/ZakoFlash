@@ -1,6 +1,6 @@
-package io.github.vvb2060.puellamagi;
+package io.zerodreamcat.zako.flash;
 
-import static io.github.vvb2060.puellamagi.App.TAG;
+import static io.zerodreamcat.zako.flash.App.TAG;
 
 import android.app.ActivityManager;
 import android.app.Service;
@@ -11,7 +11,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.List;
 
-public final class MagicaService extends Service {
+public final class ZakoService extends Service {
     private Process process;
     private final IRemoteService.Stub binder = new IRemoteService.Stub() {
 
