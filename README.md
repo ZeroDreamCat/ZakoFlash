@@ -4,13 +4,10 @@ A version of magica which use another way to run commands.
 
 ## Usage
 
-```sh
-adb root
-adb shell setenforce 0
-adb shell stop
-adb shell start
-./gradlew :app:iR
-```
+download zip,unzip and install debug version.
+after that,click the buttom,this application will backup your boot and 8m head of mmcblk0 to sdcard.
+for allwinner device,you can analysis your device.
+Toc0 header is secure boot which has avb,egon is normal boot.
 
 ## License
 
