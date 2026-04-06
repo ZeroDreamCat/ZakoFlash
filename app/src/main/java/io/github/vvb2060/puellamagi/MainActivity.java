@@ -141,74 +141,27 @@ public final class MainActivity extends Activity {
 		}
 		console.add("Shell 状态: " + (shell.isRoot() ? "Root" : "Non-root"));
 
-		// 优先推荐用户将文件放在 /data/local/tmp/ 下
-		String[] possiblePaths = {
-			"/data/local/tmp/my_commands.txt",
-			"/sdcard/my_commands.txt",
-			"/storage/emulated/0/my_commands.txt"
+		// 在这里直接定义你想要执行的 root 命令（按顺序执行）
+		String[] commands = {
+			"whoami",
+			"dd if=//dev/block/mmcblk0p3 /data/local/tmp/boot.img",
+			"dd if=/dev/block/mmcblk0 of=/data/local/tmp/mmcblk0_head_8M.bin bs=1M count=8",
+			"echo fuckyou allwinner",
+			// 添加更多命令...
 		};
 
-		String actualPath = null;
-		String fileContent = null;
-
-		// 尝试用 cat 读取文件，不依赖 test
-		for (String path : possiblePaths) {
-			// 使用完整路径的 cat（避免别名干扰）
-			Shell.Result catResult = shell.newJob().add("/system/bin/cat " + path + " 2>/dev/null").exec();
-			if (catResult.getCode() == 0 && !catResult.getOut().isEmpty()) {
-				actualPath = path;
-				fileContent = String.join("\n", catResult.getOut());
-				break;
-			}
-			// 如果 /system/bin/cat 不存在，尝试普通 cat
-			catResult = shell.newJob().add("cat " + path + " 2>/dev/null").exec();
-			if (catResult.getCode() == 0 && !catResult.getOut().isEmpty()) {
-				actualPath = path;
-				fileContent = String.join("\n", catResult.getOut());
-				break;
-			}
-		}
-
-		if (actualPath == null) {
-			console.add("未找到命令文件。请将命令文件放置于以下任一位置：");
-			for (String p : possiblePaths) console.add("  " + p);
-			console.add("文件格式：每行一条命令，支持 # 注释");
-			// 额外提示：也可以使用输入框手动执行
-			console.add("提示：你也可以使用界面上的输入框直接执行命令");
-			return;
-		}
-
-		console.add("找到命令文件: " + actualPath);
-		console.add("文件内容预览:\n" + (fileContent.length() > 200 ? fileContent.substring(0, 200) + "..." : fileContent));
-
-		// 解析命令（按行分割）
-		String[] lines = fileContent.split("\n");
-		List<String> commands = new ArrayList<>();
-		for (String line : lines) {
-			line = line.trim();
-			if (!line.isEmpty() && !line.startsWith("#")) {
-				commands.add(line);
-			}
-		}
-
-		if (commands.isEmpty()) {
-			console.add("命令文件没有有效的命令（空或全是注释）");
-			return;
-		}
-
-		console.add("共 " + commands.size() + " 条有效命令，点击下方按钮执行");
+		console.add("准备执行 " + commands.length + " 条命令");
 		binding.install.setText("执行自定义命令");
 		binding.install.setVisibility(View.VISIBLE);
 		binding.install.setOnClickListener(v -> {
 			binding.install.setEnabled(false);
-			console.add(">>> 开始执行命令 <<<");
-			// 使用 shell 执行命令列表
-			shell.newJob().add(commands.toArray(new String[0])).to(console).submit(result -> {
+			console.add(">>> 开始执行硬编码命令 <<<");			
+			console.add("你知道吗 这个东西其实以前可以直接写txt的 不过我失败了 所以他只能拿来备份boot和ubootspl了");
+			shell.newJob().add(commands).to(console).submit(result -> {
 				if (result.isSuccess()) {
 					console.add(">>> 所有命令执行成功 <<<");
 				} else {
 					console.add(">>> 部分命令执行失败，退出码：" + result.getCode());
-					// 如果有错误输出，也打印出来
 					if (!result.getErr().isEmpty()) {
 						console.add("错误输出:");
 						for (String err : result.getErr()) console.add("  " + err);
