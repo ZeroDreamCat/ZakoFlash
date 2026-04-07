@@ -24,5 +24,5 @@ jobs:
       - name: Upload debug artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-debug
-          path: app/build/outputs/debug
+          name: ${{ matrix.os }}-artifact
+          path: app/build/outputs/apk/debug
