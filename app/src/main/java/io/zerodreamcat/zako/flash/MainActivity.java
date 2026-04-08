@@ -86,6 +86,7 @@ public final class MainActivity extends Activity {
     void getRunningAppProcesses() {
         try {
             var processes = App.server.getRunningAppProcesses();
+			console.add("ZakoFlash by Github@ZeroDreamCat");
             console.add("uid pid processName pkgList importance");
             for (var process : processes) {
                 var str = String.format(Locale.ROOT, "%d %d %s %s %d",
