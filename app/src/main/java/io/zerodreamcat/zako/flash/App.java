@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import com.topjohnwu.superuser.Shell;
 import java.util.ArrayList;
+import android.util.Log;
 import java.util.List;
 import java.util.function.Consumer;
 

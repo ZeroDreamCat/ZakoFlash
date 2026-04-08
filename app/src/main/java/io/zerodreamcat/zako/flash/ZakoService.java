@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.NoShellException;
 import java.io.IOException;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public final class ZakoService extends Service {
         }
         App.addLog("ZakoService: creating root shell via exploit...");
         try {
+            App.addLog("ZakoService running in process: " + android.os.Process.myPid());
             // 记录提权前的 uid
             App.addLog("Before root, uid=" + android.os.Process.myUid());
             root();   // native 提权

@@ -38,7 +38,7 @@ public final class MainActivity extends Activity {
             App.server = IRemoteService.Stub.asInterface(binder);
             
             if (App.rootShell == null || !App.rootShell.isRoot()) {
-                console.add("ZakoFlash by Github@ZeroDreamCat.");
+                console.add("ZakoFlash by Github@ZeroDreamCat");
                 console.add("等待 root shell 就绪...");
                 
                 mainHandler.postDelayed(() -> check(), 500);
@@ -276,7 +276,7 @@ public final class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
+        App.addLog("MainActivity process: " + android.os.Process.myPid());
         // 设置日志消费者，将 App 中历史日志显示到界面
         App.setLogConsumer(log -> {
             runOnUiThread(() -> {
