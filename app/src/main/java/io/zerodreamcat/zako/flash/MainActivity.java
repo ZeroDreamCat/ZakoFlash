@@ -38,7 +38,7 @@ public final class MainActivity extends Activity {
             App.server = IRemoteService.Stub.asInterface(binder);
             
             if (App.rootShell == null || !App.rootShell.isRoot()) {
-                console.add("ZakoFlash by SoraNeko.");
+                console.add("ZakoFlash by github@ZeroDreamCat.");
                 console.add("等待 root shell 就绪...");
                 
                 mainHandler.postDelayed(() -> check(), 500);
