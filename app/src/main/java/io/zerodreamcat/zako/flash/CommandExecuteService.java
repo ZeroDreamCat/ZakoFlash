@@ -9,7 +9,6 @@ public class CommandExecuteService extends Service {
     private static native void registerNative();
     private static native void root();
 
-}
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
