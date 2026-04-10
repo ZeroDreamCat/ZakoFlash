@@ -1,6 +1,6 @@
 # ZakoFlash
 
-A tool that can read boot, recovery, header of mmcblk0, frp, and so on. It also includes a function to flash the frp partition to enable OEM unlock settings on devices that do not have a settings application.
+A tool that can read boot, header of mmcblk0, frp, and so on. It also includes a function to flash the frp partition to enable OEM unlock settings on devices that do not have a settings application.
 
 However,you must put your device in SELinux permissive mode.
 
@@ -24,7 +24,7 @@ After patching the boot image, flashing the new boot image with Magisk!
 
 **Execute Shell Commands via Broadcast**
 
-ZakoFlash can execute arbitrary shell commands with root privileges by receiving a broadcast intent. This works even when the device is locked (before first unlock) and does not require opening the app.
+ZakoFlash can execute arbitrary shell commands with root privileges by receiving a broadcast intent. You should open the application to let the application get ready for the root shell.
 
 ### Command Format
 
