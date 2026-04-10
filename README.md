@@ -39,9 +39,7 @@ Example
 Execute whoami (should output root):
 
 ```bash
-adb shell am broadcast -n io.zerodreamcat.zako.flash/.CommandReceiver \
-  -a io.zerodreamcat.zako.flash.action.EXEC \
-  --es cmd "whoami"
+adb shell am broadcast -n "io.zerodreamcat.zako.flash/.CommandReceiver" -a io.zerodreamcat.zako.flash.action.EXEC --es cmd "whoami"
 ```
 
 Get Command Output
@@ -49,7 +47,7 @@ Get Command Output
 The command output is broadcasted as a result intent with action io.zerodreamcat.zako.flash.action.RESULT. You can listen for it using a custom broadcast receiver. For quick testing, check logcat with tag ZakoFlash:
 
 ```bash
-adb logcat -s ZakoFlash:V
+adb logcat -s ZakoFlash:D CommandExecService:D
 ```
 
 Multi-Command
