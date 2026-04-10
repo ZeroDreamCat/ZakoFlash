@@ -4,19 +4,11 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+
+import com.topjohnwu.superuser.Shell;
 
 public class CommandExecuteService extends Service {
     private static final String TAG = "CmdExecService";
-
-    static {
-        System.loadLibrary("zako");
-        registerNative();  
-    }
-
-    private static native void registerNative();
-    private static native void root();
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -31,38 +23,32 @@ public class CommandExecuteService extends Service {
 
     private void executeCommand(String cmd) {
         StringBuilder output = new StringBuilder();
-        
-        if (android.os.Process.myUid() != 0) {
-            try {
-                root();
-                output.append("Rooted successfully.\n");
-            } catch (Throwable e) {
-                output.append("Root failed: ").append(e.getMessage()).append("\n");
-                sendResultAndLog(output.toString());
-                stopSelf();
-                return;
-            }
-        } else {
-            output.append("Already root.\n");
+
+        if (App.rootShell == null) {
+            output.append("Error: root shell not initialized. Please launch the app first.\n");
+            sendResultAndLog(output.toString());
+            stopSelf();
+            return;
         }
 
-        try {
-            Process process = Runtime.getRuntime().exec(new String[]{"sh", "-c", cmd});
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
+        if (!App.rootShell.isRoot()) {
+            output.append("Error: shell is not root.\n");
+            sendResultAndLog(output.toString());
+            stopSelf();
+            return;
+        }
+
+        Shell.Result result = App.rootShell.newJob().add(cmd).exec();
+        for (String line : result.getOut()) {
+            output.append(line).append("\n");
+        }
+        if (!result.getErr().isEmpty()) {
+            output.append("[stderr]\n");
+            for (String line : result.getErr()) {
                 output.append(line).append("\n");
             }
-            BufferedReader errReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            while ((line = errReader.readLine()) != null) {
-                output.append("[stderr] ").append(line).append("\n");
-            }
-            int exitCode = process.waitFor();
-            output.append("Exit code: ").append(exitCode);
-        } catch (Exception e) {
-            output.append("Exception: ").append(e.getMessage());
         }
-
+        output.append("Exit code: ").append(result.getCode());
         sendResultAndLog(output.toString());
         stopSelf();
     }
