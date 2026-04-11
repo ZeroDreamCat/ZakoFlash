@@ -181,7 +181,7 @@ public final class MainActivity extends Activity {
                 console.addAll(resultBoot.getOut());
 			}
 
-			console.add("全盘前32M备份:");
+			console.add("mmcblk0前32M备份:");
             console.add("退出码: " + exitFull);
             if (!resultFull.getOut().isEmpty()) {
                 console.addAll(resultFull.getOut());
@@ -228,20 +228,20 @@ public final class MainActivity extends Activity {
                 String statFile = "/sdcard/ZakoFlash/stat.us";
 
                 String shellScript =
-                        "cp " + backupImg + " " + cachePath + " 2>&1 || { echo '复制镜像失败'; exit 1; };" +
-                                "stat -c%s " + cachePath + " > " + statFile + " 2>&1 || { echo '获取文件大小失败'; exit 1; };" +
+                        "cp " + backupImg + " " + cachePath + " 2>&1 || { echo 'copy failed'; exit 1; };" +
+                                "stat -c%s " + cachePath + " > " + statFile + " 2>&1 || { echo 'get stat failed'; exit 1; };" +
                                 "size=$(cat " + statFile + ");" +
-                                "if [ -z \"$size\" ]; then echo '文件大小为空'; exit 1; fi;" +
+                                "if [ -z \"$size\" ]; then echo 'file empty'; exit 1; fi;" +
                                 "lastByteOffset=$((size - 1));" +
                                 "lastByte=$(dd if=" + cachePath + " bs=1 count=1 skip=$lastByteOffset 2>/dev/null | od -An -tx1 | tr -d ' \\n');" +
                                 "if [ \"$lastByte\" = \"01\" ]; then" +
-                                "    echo 'FRP 镜像最后一位已经是 0x01，无需修改，停止写入';" +
+                                "    echo 'no need';" +
                                 "    rm -f " + cachePath + ";" +
                                 "    exit 2;" +
                                 "fi;" +
-                                "printf '\\x01' | dd of=" + cachePath + " bs=1 count=1 seek=$lastByteOffset conv=notrunc 2>&1 || { echo '修改镜像最后一位失败'; exit 1; };" +
-                                "dd if=" + cachePath + " of=" + frpPath + " bs=4M 2>&1 || { echo '写入 FRP 分区失败'; exit 1; };" +
-                                "rm -f " + cachePath + " && echo '写入成功，已清理缓存'";
+                                "printf '\\x01' | dd of=" + cachePath + " bs=1 count=1 seek=$lastByteOffset conv=notrunc 2>&1 || { echo 'failed'; exit 1; };" +
+                                "dd if=" + cachePath + " of=" + frpPath + " bs=4M 2>&1 || { echo 'write failed'; exit 1; };" +
+                                "rm -f " + cachePath + " && echo 'done'";
 
                 shell.newJob()
                         .add("sh -c", shellScript)
@@ -253,7 +253,7 @@ public final class MainActivity extends Activity {
                             } else if (code == 2) {
                                 console.add(">>> FRP 已修改过，跳过修改<<<");
                             } else {
-                                console.add(">>> 写入失败，请检查上方错误信息 <<<");
+                                console.add(">>> 写入失败 <<<");
                             }
                             binding.writeFrp.setEnabled(true);
                         });

@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest ]
+        os: [ ubuntu-latest ]
 
     steps:
       - name: Check out
@@ -24,20 +24,21 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
         run: |
-          $bytes = [System.Convert]::FromBase64String($env:KEYSTORE_BASE64)
-          [System.IO.File]::WriteAllBytes("$env:RUNNER_TEMP\sr.jks", $bytes)
-        shell: powershell
+          echo "$KEYSTORE_BASE64" | base64 -d > ${{ runner.temp }}/sr.jks
+        shell: bash
 
       - name: Set signing environment variables
         run: |
-          echo "SIGNING_STORE_FILE=$env:RUNNER_TEMP\sr.jks" >> $env:GITHUB_ENV
-          echo "SIGNING_STORE_PASSWORD=${{ secrets.SIGNING_STORE_PASSWORD }}" >> $env:GITHUB_ENV
-          echo "SIGNING_KEY_ALIAS=${{ secrets.SIGNING_KEY_ALIAS }}" >> $env:GITHUB_ENV
-          echo "SIGNING_KEY_PASSWORD=${{ secrets.SIGNING_KEY_PASSWORD }}" >> $env:GITHUB_ENV
-        shell: powershell
+          echo "SIGNING_STORE_FILE=${{ runner.temp }}/sr.jks" >> $GITHUB_ENV
+          echo "SIGNING_STORE_PASSWORD=${{ secrets.SIGNING_STORE_PASSWORD }}" >> $GITHUB_ENV
+          echo "SIGNING_KEY_ALIAS=soraneko" >> $GITHUB_ENV
+          echo "SIGNING_KEY_PASSWORD=${{ secrets.SIGNING_KEY_PASSWORD}}" >> $GITHUB_ENV
+        shell: bash
 
       - name: Build with Gradle (debug only)
-        run: ./gradlew assembleDebug
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload debug artifact
         uses: actions/upload-artifact@v4
