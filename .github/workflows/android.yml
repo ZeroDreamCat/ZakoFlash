@@ -31,8 +31,8 @@ jobs:
         run: |
           echo "SIGNING_STORE_FILE=${{ runner.temp }}/sr.jks" >> $GITHUB_ENV
           echo "SIGNING_STORE_PASSWORD=${{ secrets.SIGNING_STORE_PASSWORD }}" >> $GITHUB_ENV
-          echo "SIGNING_KEY_ALIAS=${{ secrets.SIGNING_KEY_ALIAS }}" >> $GITHUB_ENV
-          echo "SIGNING_KEY_PASSWORD=soraneko" >> $GITHUB_ENV
+          echo "SIGNING_KEY_ALIAS=soraneko" >> $GITHUB_ENV
+          echo "SIGNING_KEY_PASSWORD=${{ secrets.SIGNING_KEY_PASSWORD}}" >> $GITHUB_ENV
         shell: bash
 
       - name: Build with Gradle (debug only)
