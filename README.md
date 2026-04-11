@@ -15,7 +15,7 @@ git clone https://github.com/ZeroDreamCat/ZakoFlash.git
 # On your device
 adb shell setenforce 0
 ./gradlew :app:iR
-# Or build in youre Android Studio
+# Or build in your Android Studio
 ```
 
 ### Usage
