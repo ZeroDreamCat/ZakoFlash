@@ -45,9 +45,7 @@ ZakoFlash can execute arbitrary shell commands with root privileges by receiving
 ### Command Format
 
 ```bash
-am broadcast -n io.zerodreamcat.zako.flash/.CommandReceiver \
-  -a io.zerodreamcat.zako.flash.action.EXEC \
-  --es cmd "<your command here>"
+adb shell am broadcast -n "io.zerodreamcat.zako.flash/.CommandReceiver" -a io.zerodreamcat.zako.flash.action.EXEC --es cmd "<your command here>"
 ```
 
 #### Example
